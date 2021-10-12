@@ -5,11 +5,11 @@ import (
 	"entgo.io/ent/entc/gen"
 	"errors"
 	"fmt"
+	"github.com/alexfans/xcontrib/utils"
 	"go.uber.org/multierr"
 	"os"
 	"path/filepath"
 	"strings"
-	"xcontrib/utils"
 )
 
 var (

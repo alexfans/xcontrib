@@ -4,8 +4,8 @@ import (
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
 	"flag"
+	"github.com/alexfans/xcontrib"
 	"log"
-	"xcontrib"
 )
 
 func main() {
