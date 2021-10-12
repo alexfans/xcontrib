@@ -1,0 +1,52 @@
+{{define "service"}}
+    {{ $structName :=  concat "" (firstLower .Name) "Service" }}
+
+    package {{.Package}}
+
+    import (
+    "context"
+    "errors"
+    "{{.BasePackage}}/dao"
+    "{{.BasePackage}}/ent"
+    "{{.BasePackage}}/ent/predicate"
+    "{{.BasePackage}}/helper/servicehelper"
+    "{{.BasePackage}}/vm"
+    )
+
+    var (
+    {{.Name}}Service = &{{$structName}}{}
+    )
+
+    type {{$structName}} struct {
+    }
+
+    {{template "create_service" . }}
+
+    {{template "delete_service" . }}
+
+    {{template "update_service" . }}
+
+    {{template "one_service" . }}
+
+    {{template "list_service" . }}
+
+    {{template "count_service" . }}
+
+
+    {{range $i, $edge := .ToEdges -}}
+        {{template "toedge_service" $edge}}
+    {{end -}}
+
+    {{range $i, $edge := .FromEdges -}}
+        {{template "fromedge_service" $edge}}
+    {{end -}}
+
+    func {{firstLower .Name}}ModelToVm(m *ent.{{.Name}}) *vm.{{.Name}} {
+    return &vm.{{.Name}}{
+    {{range $i, $field := .ViewFields -}}
+        {{pascal $field.Name}} : {{if (eq $field.Type.String  "time.Time") }} servicehelper.TimeFormat(m.{{pascal $field.Name}}) {{else}} m.{{pascal $field.Name}} {{end}} ,
+    {{end -}}
+    }
+    }
+
+{{end}}

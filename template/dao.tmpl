@@ -1,0 +1,48 @@
+{{define "dao"}}
+    {{ $structName :=  concat "" (firstLower .Name) "Dao" }}
+
+    package dao
+
+    import (
+    "context"
+    "time"
+    "{{.BasePackage}}/ent"
+    "{{.BasePackage}}/ent/{{camel .Name}}"
+    "{{.BasePackage}}/ent/predicate"
+    "{{.BasePackage}}/helper/daohelper"
+    {{$BasePackage := .BasePackage}}
+    {{range $i,$edge := .GenType.Edges -}}
+        "{{$BasePackage}}/ent/{{camel $edge.Type.Name}}"
+    {{end}}
+    )
+
+
+    var (
+    {{.Name}}Dao = &{{$structName}}{}
+    )
+
+    type {{$structName}} struct {
+    daohelper.BaseDao
+    }
+
+    {{template "create_dao" .}}
+
+    {{template "delete_dao" .}}
+
+    {{template "update_dao" .}}
+
+    {{template "one_dao" .}}
+
+    {{template "list_dao" .}}
+
+    {{template "count_dao" .}}
+
+    {{range $i, $edge := .ToEdges -}}
+        {{template "toedge_dao" $edge}}
+    {{end -}}
+
+    {{range $i, $edge := .FromEdges -}}
+        {{template "fromedge_dao" $edge}}
+    {{end -}}
+
+{{end}}

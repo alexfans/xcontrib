@@ -1,0 +1,69 @@
+{{define "echo"}}
+    {{ $structName :=  concat "" (firstLower .Name) "Action" }}
+
+    package {{.Package}}
+
+    import (
+    "github.com/labstack/echo"
+    "net/http"
+    "strconv"
+    "{{.BasePackage}}/helper/echohelper"
+    "{{.BasePackage}}/service"
+    "{{.BasePackage}}/vm"
+    )
+
+
+    var (
+    {{.Name}}Action = &{{$structName}}{}
+    )
+
+    func init() {
+    echohelper.AddAction( {{.Name}}Action )
+    }
+
+    func init() {
+    {{- template "create_echo_router" . }}
+    {{- template "delete_echo_router" . }}
+    {{- template "update_echo_router" . }}
+    {{- template "one_echo_router" . }}
+    {{- template "list_echo_router" . }}
+    {{- template "count_echo_router" . }}
+
+    {{range $i, $edge := .ToEdges -}}
+        {{template "toedge_echo_router" $edge}}
+    {{end -}}
+
+    {{range $i, $edge := .FromEdges -}}
+        {{template "fromedge_echo_router" $edge}}
+    {{end -}}
+    }
+
+    type {{$structName}} struct {
+    echohelper.BaseAction
+    }
+
+    func (a {{$structName}}) Name() string {
+    return "{{snake .Name }}"
+    }
+
+    func (a {{$structName}}) Path() string {
+    return "{{snake .Name }}"
+    }
+
+    {{template "create_echo" . }}
+    {{template "delete_echo" . }}
+    {{template "update_echo" . }}
+    {{template "one_echo" .}}
+    {{template "list_echo" .}}
+    {{template "count_echo" .}}
+
+    {{range $i, $edge := .ToEdges -}}
+        {{template "toedge_echo" $edge}}
+    {{end -}}
+
+    {{range $i, $edge := .FromEdges -}}
+        {{template "fromedge_echo" $edge}}
+    {{end -}}
+
+
+{{end}}

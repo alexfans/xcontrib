@@ -1,0 +1,26 @@
+{{define "vm"}}
+    package {{.Package}}
+
+    type {{.Name}} struct {
+    {{range $i, $field := .ViewFields -}}
+        {{pascal $field.Name}} {{if (eq $field.Type.String  "time.Time") }} string {{else}} {{$field.Type.String}} {{end}} `{{$field.StructTag}}`
+    {{end -}}
+    }
+
+    type {{.Name}}List struct {
+    List []*{{.Name}} `json:"list"`
+    }
+
+    type {{.Name}}Count struct {
+    Count int `json:"count"`
+    }
+
+    {{template "create_vm" .}}
+    {{template "update_vm" .}}
+
+    {{range $i, $edge := .ToEdges -}}
+        {{template "toedge_vm" $edge}}
+    {{end -}}
+
+{{end}}
+

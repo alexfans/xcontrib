@@ -1,0 +1,133 @@
+{{define "toedge_vm"}}
+    type {{.Name}}{{pascal .Edge.Name}} struct {
+    // TODO
+    IDList []int `json:"id_list"`
+    }
+    type {{.Name}}{{pascal .Edge.Name}}Rsp struct {
+    Affected int `json:"affected"`
+    }
+{{end}}
+
+{{define "fromedge_dao_create" }}
+    // {{pascal .Edge.Name}}Create for {{firstLower .Name}}Dao {{pascal .Edge.Name}}Create
+    func  (d {{firstLower .Name}}Dao ) {{pascal .Edge.Name}}Create(ctx context.Context,id int,idList []int, ps []predicate.{{pascal .Name}}, ) (int, error) {
+    engine := d.Client().{{.Name}}.Update()
+    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    engine.Where(ps...)
+    engine.Where({{camel .Name}}.ID(id))
+    engine.Add{{.Edge.Type.Name}}IDs(idList...)
+    return engine.Save(ctx)
+    }
+{{end}}
+
+{{define "fromedge_dao_delete" }}
+    // {{pascal .Edge.Name}}Delete for {{firstLower .Name}}Dao {{pascal .Edge.Name}}Delete
+    func  (d {{firstLower .Name}}Dao ) {{pascal .Edge.Name}}Delete(ctx context.Context,id int, idList []int,  ps []predicate.{{pascal .Name}}) (int, error) {
+    engine := d.Client().{{.Name}}.Update()
+    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    engine.Where({{camel .Name}}.ID(id))
+    engine.Where(ps...)
+    engine.Remove{{.Edge.Type.Name}}IDs(idList...)
+    return engine.Save(ctx)
+    }
+{{end}}
+
+{{define "toedge_dao"}}
+    {{template "fromedge_dao" .}}
+    {{template "fromedge_dao_create" .}}
+    {{template "fromedge_dao_delete" .}}
+{{end}}
+
+{{define "fromedge_service_create" }}
+    // {{pascal .Edge.Name}}Create for {{firstLower .Name}}Service {{pascal .Edge.Name}}Create
+    func  (s {{firstLower .Name}}Service ) {{pascal .Edge.Name}}Create(ctx context.Context,id int, v vm.{{.Name}}{{pascal .Edge.Name}}, param *servicehelper.Param) (*vm.{{.Name}}{{pascal .Edge.Name}}Rsp, error) {
+    if err := servicehelper.Validate(v); err != nil {
+    return nil, err
+    }
+    wheres := make([]predicate.{{.Name}}, 0)
+    {{template "restricts" .Descriptor}}
+
+    aff, err := dao.{{.Name}}Dao.{{pascal .Edge.Name}}Create(ctx, id, v.IDList, wheres)
+    if err != nil {
+    return nil, err
+    }
+    data := &vm.{{.Name}}{{pascal .Edge.Name}}Rsp{
+    Affected: aff,
+    }
+    return data, nil
+    }
+{{end}}
+
+{{define "fromedge_service_delete" }}
+    // {{pascal .Edge.Name}}Delete for {{firstLower .Name}}Service {{pascal .Edge.Name}}Delete
+    func  (s {{firstLower .Name}}Service ) {{pascal .Edge.Name}}Delete(ctx context.Context,id int, v vm.{{.Name}}{{pascal .Edge.Name}}, param *servicehelper.Param) (*vm.{{.Name}}{{pascal .Edge.Name}}Rsp, error) {
+    if err := servicehelper.Validate(v); err != nil {
+    return nil, err
+    }
+    wheres := make([]predicate.{{.Name}}, 0)
+    {{template "restricts" .Descriptor}}
+
+    aff, err := dao.{{.Name}}Dao.{{pascal .Edge.Name}}Delete(ctx, id, v.IDList, wheres)
+    if err != nil {
+    return nil, err
+    }
+    data := &vm.{{.Name}}{{pascal .Edge.Name}}Rsp{
+    Affected: aff,
+    }
+    return data, nil
+    }
+{{end}}
+
+{{define "toedge_service"}}
+    {{template "fromedge_service" .}}
+    {{template "fromedge_service_create" .}}
+    {{template "fromedge_service_delete" .}}
+{{end}}
+
+{{define "toedge_echo_router"}}
+    {{template "fromedge_echo_router" .}}
+    echohelper.AddRouter({{.Name}}Action, "/:id/{{.Edge.Name}}", echo.POST, {{.Name}}Action.{{pascal .Edge.Name}}Create)
+    echohelper.AddRouter({{.Name}}Action, "/:id/{{.Edge.Name}}", echo.DELETE, {{.Name}}Action.{{pascal .Edge.Name}}Delete)
+{{end}}
+
+{{define "fromedge_echo_create"}}
+    // {{pascal .Edge.Name}}Create for {{firstLower .Name}}Action {{pascal .Edge.Name}}Create
+    func(a {{firstLower .Name}}Action) {{pascal .Edge.Name}}Create(c echo.Context) error {
+    v := vm.{{.Name}}{{pascal .Edge.Name}}{}
+    if err := a.Bind(c, &v); err != nil {
+    return a.RenderRequestError(c, err)
+    }
+    id, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+    return a.RenderRequestError(c, err)
+    }
+
+    param := servicehelper.NewParam(c.QueryParams())
+    data, err := service.{{.Name}}Service.{{pascal .Edge.Name}}Create(c.Request().Context(), id, v, param)
+    return a.RenderWrapper(c, data, err)
+    }
+{{end}}
+
+{{define "fromedge_echo_delete"}}
+    // {{pascal .Edge.Name}}Delete for {{firstLower .Name}}Action {{pascal .Edge.Name}}Delete
+    func(a {{firstLower .Name}}Action) {{pascal .Edge.Name}}Delete(c echo.Context) error {
+    v := vm.{{.Name}}{{pascal .Edge.Name}}{}
+    if err := a.Bind(c, &v); err != nil {
+    return a.RenderRequestError(c, err)
+    }
+    id, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+    return a.RenderRequestError(c, err)
+    }
+    param := servicehelper.NewParam(c.QueryParams())
+
+    data, err := service.{{.Name}}Service.{{pascal .Edge.Name}}Delete(c.Request().Context(), id, v, param)
+    return a.RenderWrapper(c, data, err)
+    }
+{{end}}
+
+{{define "toedge_echo"}}
+    {{template "fromedge_echo" .}}
+    {{template "fromedge_echo_create" .}}
+    {{template "fromedge_echo_delete" .}}
+{{end}}

@@ -1,0 +1,81 @@
+{{define "update_vm"}}
+    {{if .CanUpdate}}
+        type Update{{.Name}}Req struct {
+        {{range $i, $field := .UpdateFields -}}
+            {{ pascal $field.Name}} {{if (eq $field.Type.String  "time.Time") }} string {{else}} {{$field.Type.String}} {{end}} `{{$field.StructTag}}`
+        {{end -}}
+        }
+    {{end}}
+{{end}}
+
+{{define "update_dao"}}
+    {{if .CanUpdate}}
+        // Update for {{firstLower .Name}}Dao Update
+        func  (d {{firstLower .Name}}Dao ) Update(ctx context.Context, id int, model *ent.{{.Name}}, ps ...predicate.{{.Name}}) (int, error) {
+        engine := d.Client().{{.Name}}.Update()
+        {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+        engine.Where({{camel .Name}}.ID(id))
+        engine.Where(ps...)
+        {{range $i, $field := .UpdateFields -}}
+            engine.Set{{pascal $field.Name}}(model.{{pascal $field.Name}})
+        {{end -}}
+        return engine.Save(ctx)
+        }
+    {{end}}
+{{end}}
+
+{{define "update_service"}}
+    {{if .CanUpdate}}
+        // Update for {{firstLower .Name}}Service Update
+        func  (s {{firstLower .Name}}Service ) Update(ctx context.Context, id int, v vm.Update{{.Name}}Req, param *servicehelper.Param) (*vm.{{.Name}}, error) {
+        if err := servicehelper.Validate(v); err != nil {
+        return nil, err
+        }
+        wheres := make([]predicate.{{.Name}}, 0)
+        {{template "restricts" .}}
+
+        model,err := dao.{{.Name}}Dao.One(ctx, id, wheres)
+        if err != nil {
+        return nil, err
+        }
+        // TODO check empty value
+
+        aff, err := dao.{{.Name}}Dao.Update(ctx, id, model)
+        if err != nil {
+        return nil, err
+        }
+        if aff != 1 {
+        return nil, errors.New("update {{camel .Name}} failed")
+        }
+
+        data := {{firstLower .Name}}ModelToVm(model)
+        return data, nil
+        }
+    {{end}}
+{{end}}
+
+{{define "update_echo_router"}}
+    {{if .CanUpdate}}
+        echohelper.AddRouter({{.Name}}Action, "/:id", echo.PUT, {{.Name}}Action.Update)
+    {{end}}
+{{end}}
+
+{{define "update_echo"}}
+    {{if .CanUpdate}}
+        // Update for {{firstLower .Name}}Action Update
+        func(a {{firstLower .Name}}Action) Update(c echo.Context) error {
+        id, err := strconv.Atoi(c.Param("id"))
+        if err != nil {
+        return a.RenderRequestError(c, err)
+        }
+        v := vm.Update{{.Name}}Req{}
+        if err := a.Bind(c, &v); err != nil {
+        return a.RenderRequestError(c, err)
+        }
+        param := servicehelper.NewParam(c.QueryParams())
+
+        data, err := service.{{.Name}}Service.Update(c.Request().Context(), id, v, param)
+        return a.RenderWrapper(c, data, err)
+        }
+    {{end}}
+{{end}}

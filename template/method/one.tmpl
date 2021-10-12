@@ -1,0 +1,43 @@
+{{define "one_dao"}}
+    // One for {{firstLower .Name}}Dao Update
+    func  (d {{firstLower .Name}}Dao ) One(ctx context.Context, id int, ps []predicate.{{.Name}}) (*ent.{{.Name}}, error) {
+    engine := d.Client().{{.Name}}.Query()
+    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    engine.Where({{camel .Name}}.ID(id))
+    engine.Where(ps...)
+    return engine.Only(ctx)
+    }
+{{end}}
+
+{{define "one_service"}}
+    // One for {{firstLower .Name}}Service One
+    func  (s {{firstLower .Name}}Service ) One(ctx context.Context, id int, param *servicehelper.Param) (*vm.{{.Name}}, error) {
+    wheres := make([]predicate.{{.Name}}, 0)
+    {{template "restricts" .}}
+
+    model,err := dao.{{.Name}}Dao.One(ctx, id, wheres)
+    if err != nil {
+    return nil, err
+    }
+    data := {{firstLower .Name}}ModelToVm(model)
+    return data, nil
+    }
+{{end}}
+
+{{define "one_echo_router"}}
+    echohelper.AddRouter({{.Name}}Action, "/:id", echo.GET, {{.Name}}Action.One)
+{{end}}
+
+{{define "one_echo"}}
+    // One for {{firstLower .Name}}Action One
+    func(a {{firstLower .Name}}Action) One(c echo.Context) error {
+    id, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+    return a.RenderRequestError(c, err)
+    }
+    param := servicehelper.NewParam(c.QueryParams())
+
+    data, err := service.{{.Name}}Service.One(c.Request().Context(), id, param)
+    return a.RenderWrapper(c, data, err)
+    }
+{{end}}

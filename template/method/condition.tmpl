@@ -1,0 +1,46 @@
+{{define "filters"}}
+    {{- $descriptor := . -}}
+    {{- $genName := camel $descriptor.Name  -}}
+    {{- range $_, $filter := $descriptor.FilterList}}
+        {{$condition := NewConditionWrapper $filter.Condition $genName}}
+        if v, err := param.Get{{$filter.ParamType}}("{{$filter.Param}}"); err == nil {
+        {{if eq $filter.ParamType.String "Any"}} _ = v{{end -}}
+        wheres = append(wheres,
+        {{- template "condition" $condition }}
+        )
+        }
+    {{- end -}}
+{{end}}
+
+
+{{define "restricts"}}
+    {{- $descriptor := . -}}
+    {{- $genName := camel $descriptor.Name  -}}
+    {{- range $_, $filter := $descriptor.RestrictList}}
+        {{$condition := NewConditionWrapper $filter.Condition $genName}}
+        wheres = append(wheres,
+        {{- template "condition" $condition }}
+        )
+    {{- end -}}
+{{end}}
+
+{{define "condition"}}
+    {{- $condition := . -}}
+    {{- $genName := $condition.GenName  -}}
+    {{- if eq $condition.Kind.String "var"}}
+        {{$genName}}.{{pascal $condition.Column}}{{$condition.Predicate.String}}( v ),
+    {{- end -}}
+
+    {{- if eq $condition.Kind.String "const"}}
+        {{$genName}}.{{pascal $condition.Column}}{{$condition.Predicate.String}}( {{$condition.Value}} ),
+    {{- end -}}
+
+    {{- if eq $condition.Kind.String "operator"}}
+        {{$genName}}.{{$condition.Operator.String}} (
+        {{- range $_,$c := $condition.Conditions}}
+            {{- $subcondition := NewConditionWrapper $c $condition.GenName -}}
+            {{- template "condition" $subcondition -}}
+        {{end}}
+        ),
+    {{- end -}}
+{{end}}

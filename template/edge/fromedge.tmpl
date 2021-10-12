@@ -1,0 +1,190 @@
+{{define "fromedge_dao_o2m"}}
+    // {{pascal .Edge.Name}} for {{firstLower .Name}}Dao {{pascal .Edge.Name}}
+    func  (d {{firstLower .Name}}Dao ) {{pascal .Edge.Name}}(ctx context.Context, id int, ps []predicate.{{pascal .Name}}, eps []predicate.{{.Edge.Type.Name}}) (*ent.{{.Edge.Type.Name}}, error) {
+    engine := d.Client().{{.Name}}.Query()
+    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    engine.Where({{camel .Name}}.ID(id))
+    engine.Where(ps...)
+    edgeEngine := engine.Query{{pascal .Edge.Name}}()
+    {{if (canDelete .Edge.Type)}} edgeEngine.Where({{camel .Edge.Type.Name}}.IsDeleted(0)){{end}}
+    edgeEngine.Where(eps...)
+    return edgeEngine.Only(ctx)
+    }
+{{end}}
+
+{{define "fromedge_dao_m2m"}}
+    // {{pascal .Edge.Name}} for {{firstLower .Name}}Dao {{pascal .Edge.Name}}
+    func  (d {{firstLower .Name}}Dao ) {{pascal .Edge.Name}}(ctx context.Context, id int, offset int, limit int,ps []predicate.{{pascal .Name}}, eps []predicate.{{.Edge.Type.Name}}, eos []ent.OrderFunc) ([]*ent.{{.Edge.Type.Name}}, error) {
+    engine := d.Client().{{.Name}}.Query()
+    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    engine.Where({{camel .Name}}.ID(id))
+    engine.Where(ps...)
+    edgeEngine := engine.Query{{pascal .Edge.Name}}()
+    {{if (canDelete .Edge.Type)}} edgeEngine.Where({{camel .Edge.Type.Name}}.IsDeleted(0)){{end}}
+    edgeEngine.Where(eps...)
+    edgeEngine.Order(eos...)
+    edgeEngine.Offset(offset)
+    edgeEngine.Limit(limit)
+    return edgeEngine.All(ctx)
+    }
+
+    // {{pascal .Edge.Name}}Count for {{firstLower .Name}}Dao {{pascal .Edge.Name}}Count
+    func  (d {{firstLower .Name}}Dao ) {{pascal .Edge.Name}}Count(ctx context.Context, id int, ps []predicate.{{pascal .Name}},  eps []predicate.{{.Edge.Type.Name}}) (int, error) {
+    engine := d.Client().{{.Name}}.Query()
+    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    engine.Where({{camel .Name}}.ID(id))
+    engine.Where(ps...)
+    edgeEngine := engine.Query{{pascal .Edge.Name}}()
+    {{if (canDelete .Edge.Type)}} edgeEngine.Where({{camel .Edge.Type.Name}}.IsDeleted(0)){{end}}
+    edgeEngine.Where(eps...)
+    return edgeEngine.Count(ctx)
+    }
+{{end}}
+
+{{define "fromedge_dao"}}
+    {{if .Edge.Unique}}
+        {{template "fromedge_dao_o2m" .}}
+    {{else}}
+        {{template "fromedge_dao_m2m" .}}
+    {{end}}
+{{end}}
+
+{{define "fromedge_service_o2m"}}
+    // {{pascal .Edge.Name}} for {{firstLower .Name}}Service {{pascal .Edge.Name}}
+    func  (s {{firstLower .Name}}Service ) {{pascal .Edge.Name}}(ctx context.Context, id int, param *servicehelper.Param) (*vm.{{.Edge.Type.Name}}, error) {
+    wheres := make([]predicate.{{.Name}}, 0)
+    ewheres := make([]predicate.{{.Edge.Type.Name}}, 0)
+    {{template "restricts" .Descriptor}}
+    {{template "edge_restricts" .}}
+    {{template "edge_filters" .}}
+    m, err := dao.{{.Name}}Dao.{{pascal .Edge.Name}}(ctx, id, wheres, ewheres)
+    if err != nil {
+    return nil, err
+    }
+
+    data := {{firstLower .Edge.Type.Name}}ModelToVm(m)
+    return data, nil
+    }
+{{end}}
+
+
+{{define "fromedge_service_m2m"}}
+    // {{pascal .Edge.Name}} for {{firstLower .Name}}Service {{pascal .Edge.Name}}
+    func  (s {{firstLower .Name}}Service ) {{pascal .Edge.Name}}(ctx context.Context, id int, param *servicehelper.Param) (*vm.{{.Edge.Type.Name}}List, error) {
+    wheres := make([]predicate.{{.Name}}, 0)
+    ewheres := make([]predicate.{{.Edge.Type.Name}}, 0)
+    eorders := make([]ent.OrderFunc, 0, 0)
+
+    {{template "restricts" .Descriptor}}
+    {{template "edge_restricts" .}}
+    {{template "edge_filters" .}}
+    {{template "edge_sorts" .}}
+
+    list, err := dao.{{.Name}}Dao.{{pascal .Edge.Name}}(ctx, id, param.Offset(), param.Limit(), wheres, ewheres, eorders)
+    if err != nil {
+    return nil, err
+    }
+
+    data := &vm.{{(.Edge.Type.Name)}}List{
+    List: make([]*vm.{{(.Edge.Type.Name)}}, 0, len(list)),
+    }
+    for _, model := range list {
+    data.List = append(data.List, {{firstLower .Edge.Type.Name}}ModelToVm(model))
+    }
+    return data, nil
+    }
+
+    // {{pascal .Edge.Name}}Count for {{firstLower .Name}}Service {{pascal .Edge.Name}}Count
+    func  (s {{firstLower .Name}}Service ) {{pascal .Edge.Name}}Count(ctx context.Context, id int, param *servicehelper.Param) (*vm.{{.Edge.Type.Name}}Count, error) {
+    wheres := make([]predicate.{{.Name}}, 0)
+    ewheres := make([]predicate.{{.Edge.Type.Name}}, 0)
+
+    {{template "restricts" .Descriptor}}
+    {{template "edge_restricts" .}}
+    {{template "edge_filters" .}}
+
+    count, err := dao.{{.Name}}Dao.{{pascal .Edge.Name}}Count(ctx, id, wheres, ewheres)
+    if err != nil {
+    return nil, err
+    }
+
+    data := &vm.{{(.Edge.Type.Name)}}Count{
+    Count:count,
+    }
+
+    return data, nil
+    }
+{{end}}
+
+{{define "fromedge_service"}}
+    {{if .Edge.Unique}}
+        {{template "fromedge_service_o2m" .}}
+    {{else}}
+        {{template "fromedge_service_m2m" .}}
+    {{end}}
+{{end}}
+
+{{define "fromedge_echo_router_o2m"}}
+    echohelper.AddRouter({{.Name}}Action, "/:id/{{.Edge.Name}}", echo.GET, {{.Name}}Action.{{pascal .Edge.Name}})
+{{end}}
+
+{{define "fromedge_echo_router_m2m"}}
+    echohelper.AddRouter({{.Name}}Action, "/:id/{{.Edge.Name}}", echo.GET, {{.Name}}Action.{{pascal .Edge.Name}})
+    echohelper.AddRouter({{.Name}}Action, "/:id/{{.Edge.Name}}/_count", echo.GET, {{.Name}}Action.{{pascal .Edge.Name}}Count)
+{{end}}
+
+{{define "fromedge_echo_router"}}
+    {{if .Edge.Unique}}
+        {{template "fromedge_echo_router_o2m" .}}
+    {{else}}
+        {{template "fromedge_echo_router_m2m" .}}
+    {{end}}
+{{end}}
+
+{{define "fromedge_echo_o2m"}}
+    // {{pascal .Edge.Name}} for {{firstLower .Name}}Action {{pascal .Edge.Name}}
+    func(a {{firstLower .Name}}Action) {{pascal .Edge.Name}}(c echo.Context) error {
+    id, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+    return a.RenderRequestError(c, err)
+    }
+    param := servicehelper.NewParam(c.QueryParams())
+
+    data, err := service.{{.Name}}Service.{{pascal .Edge.Name}}(c.Request().Context(), id, param)
+    return a.RenderWrapper(c, data, err)
+    }
+{{end}}
+
+{{define "fromedge_echo_m2m"}}
+    // {{pascal .Edge.Name}} for {{firstLower .Name}}Action {{pascal .Edge.Name}}
+    func(a {{firstLower .Name}}Action) {{pascal .Edge.Name}}(c echo.Context) error {
+    id, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+    return a.RenderRequestError(c, err)
+    }
+    param := servicehelper.NewParam(c.QueryParams())
+
+    data, err := service.{{.Name}}Service.{{pascal .Edge.Name}}(c.Request().Context(), id, param)
+    return a.RenderWrapper(c, data, err)
+    }
+
+    // {{pascal .Edge.Name}}Count for {{firstLower .Name}}Action {{pascal .Edge.Name}}Count
+    func(a {{firstLower .Name}}Action) {{pascal .Edge.Name}}Count(c echo.Context) error {
+    id, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+    return a.RenderRequestError(c, err)
+    }
+
+    param := servicehelper.NewParam(c.QueryParams())
+    data, err := service.{{.Name}}Service.{{pascal .Edge.Name}}Count(c.Request().Context(), id, param)
+    return a.RenderWrapper(c, data, err)
+    }
+{{end}}
+
+{{define "fromedge_echo"}}
+    {{if .Edge.Unique}}
+        {{template "fromedge_echo_o2m" .}}
+    {{else}}
+        {{template "fromedge_echo_m2m" .}}
+    {{end}}
+{{end}}

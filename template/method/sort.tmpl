@@ -1,0 +1,13 @@
+{{define "sorts"}}
+    {{- $descriptor := . -}}
+    {{if gt (len .SortList) 0}}
+        for _, param := range param.Orders() {
+        switch param {
+        {{- range $_,$sort := .SortList -}}
+            case "{{$sort.Param}}":
+            orders = append(orders, ent.{{$sort.Order}}({{range $_,$column :=  $sort.Columns}}{{camel $descriptor.Name}}.Field{{pascal $column}},{{end}}))
+        {{end -}}
+        }
+        }
+    {{end}}
+{{end}}

@@ -1,0 +1,53 @@
+{{define "list_dao"}}
+    // List for {{firstLower .Name}}Dao Update
+    func  (d {{firstLower .Name}}Dao ) List(ctx context.Context,offset int, limit int, ps []predicate.{{.Name}}, os []ent.OrderFunc) ([]*ent.{{.Name}}, error) {
+    engine := d.Client().{{.Name}}.Query()
+    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    engine.Where(ps...)
+    engine.Order(os...)
+    engine.Offset(offset)
+    engine.Limit(limit)
+    return engine.All(ctx)
+    }
+{{end}}
+
+{{define "list_service"}}
+    // List for {{firstLower .Name}}Service List
+    func  (s {{firstLower .Name}}Service ) List(ctx context.Context, param *servicehelper.Param) (*vm.{{.Name}}List, error) {
+    wheres := make([]predicate.{{.Name}}, 0)
+    orders := make([]ent.OrderFunc, 0, 0)
+
+    {{template "restricts" .}}
+
+    {{template "filters" .}}
+
+    {{template "sorts" .}}
+
+    list, err := dao.{{.Name}}Dao.List(ctx, param.Offset(), param.Limit(), wheres, orders)
+    if err != nil {
+    return nil, err
+    }
+    data := &vm.{{.Name}}List{
+    List: make([]*vm.{{.Name}}, 0, len(list)),
+    }
+    for _, model := range list {
+    data.List = append(data.List, {{firstLower .Name}}ModelToVm(model))
+    }
+
+    return data, nil
+    }
+{{end}}
+
+{{define "list_echo_router"}}
+    echohelper.AddRouter({{.Name}}Action, "", echo.GET, {{.Name}}Action.List)
+{{end}}
+
+{{define "list_echo"}}
+    // List for {{firstLower .Name}}Action List
+    func (a {{firstLower .Name}}Action) List(c echo.Context) error {
+    param := servicehelper.NewParam(c.QueryParams())
+
+    data, err := service.{{.Name}}Service.List(c.Request().Context(), param)
+    return a.RenderWrapper(c, data, err)
+    }
+{{end}}

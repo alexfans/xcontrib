@@ -1,0 +1,63 @@
+{{define "delete_dao"}}
+    {{if .CanDelete}}
+        // Delete for {{firstLower .Name}}Dao Delete
+        func  (d {{firstLower .Name}}Dao ) Delete(ctx context.Context, id int, ps ...predicate.{{.Name}}) (int, error) {
+        engine := d.Client().{{.Name}}.Update()
+        {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+        engine.Where({{camel .Name}}.ID(id))
+        engine.Where(ps...)
+        {{if .CanDelete }} engine.SetIsDeleted(1) {{end}}
+        {{if .CanDelete }} engine.SetDeletedAt(time.Now()) {{end}}
+        return engine.Save(ctx)
+        }
+    {{end}}
+{{end}}
+
+{{define "delete_service"}}
+    {{if .CanDelete}}
+        // Delete for {{firstLower .Name}}Service Delete
+        func  (s {{firstLower .Name}}Service ) Delete(ctx context.Context, id int, param *servicehelper.Param) (*vm.{{.Name}}, error) {
+        wheres := make([]predicate.{{.Name}}, 0)
+        {{template "restricts" .}}
+
+        model,err := dao.{{.Name}}Dao.One(ctx, id, wheres)
+        if err != nil {
+        return nil, err
+        }
+        // TODO check empty value
+
+        aff, err := dao.{{.Name}}Dao.Delete(ctx, id)
+        if err != nil {
+        return nil, err
+        }
+        if aff != 1 {
+        return nil, errors.New("delete {{camel .Name}} failed")
+        }
+
+        data := {{firstLower .Name}}ModelToVm(model)
+        return data, nil
+        }
+    {{end}}
+{{end}}
+
+{{define "delete_echo_router"}}
+    {{if .CanDelete}}
+        echohelper.AddRouter({{.Name}}Action, "/:id", echo.DELETE, {{.Name}}Action.Delete)
+    {{end}}
+{{end}}
+
+{{define "delete_echo"}}
+    {{if .CanDelete}}
+        // Delete for {{firstLower .Name}}Action Delete
+        func(a {{firstLower .Name}}Action) Delete(c echo.Context) error {
+        id, err := strconv.Atoi(c.Param("id"))
+        if err != nil {
+        return a.RenderRequestError(c, err)
+        }
+        param := servicehelper.NewParam(c.QueryParams())
+
+        data, err := service.{{.Name}}Service.Delete(c.Request().Context(), id, param)
+        return a.RenderWrapper(c, data, err)
+        }
+    {{end}}
+{{end}}

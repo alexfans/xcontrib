@@ -1,0 +1,106 @@
+{{define "doc" -}}
+# {{.Comments}} ({{snake .Name}})
+
+---
+## 字段信息
+
+|名称|类型|备注|
+|:---:|:---:|:---|
+{{range $i, $field := .ViewFields -}}
+|{{$field.Name}}|{{$field.Type.String}}|{{$field.Comment}}|
+{{end -}}
+
+
+
+
+--- 
+
+## 创建{{.Comments}}
+
+URL: {BASE_URL}/{{snake .Name}}
+
+METHOD: `POST`
+
+
+
+
+
+
+
+---
+
+## 删除{{.Comments}}
+
+URL: {BASE_URL}/{{snake .Name}}/:id
+
+METHOD: `DELETE`
+
+### 路径参数
+
+|名称|类型|备注|
+|:---:|:---:|:---|
+|id|int|{{.Comments}} ID|
+
+
+
+
+---
+
+## 更新{{.Comments}}
+
+URL: {BASE_URL}/{{snake .Name}}/:id
+
+METHOD: `PUT`
+
+### 路径参数
+
+|名称|类型|备注|
+|:---:|:---:|:---|
+|id|int|{{.Comments}} ID|
+
+
+
+---
+
+## 获取{{.Comments}}单项记录
+
+URL: {BASE_URL}/{{snake .Name}}/:id
+
+METHOD: `GET`
+
+### 路径参数
+
+|名称|类型|备注|
+|:---:|:---:|:---|
+|id|int|{{.Comments}} ID|
+
+
+
+---
+
+## 获取{{.Comments}}列表
+
+URL: {BASE_URL}/{{snake .Name}}
+
+METHOD: `GET`
+
+
+
+
+
+
+
+
+
+
+---
+## 获取{{.Comments}}数量
+URL: {BASE_URL}/{{snake .Name}}/_count
+
+METHOD: `GET`
+
+
+
+
+
+{{end}}
