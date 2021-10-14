@@ -27,8 +27,11 @@
 
     {{template "create_dao" .}}
 
-    {{template "delete_dao" .}}
-
+    {{if .IsHardDelete}}
+    {{template "delete_dao_hard" .}}
+    {{else}}
+    {{template "delete_dao_soft" .}}
+    {{end}}
     {{template "update_dao" .}}
 
     {{template "one_dao" .}}

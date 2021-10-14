@@ -1,12 +1,15 @@
 {{define "create_vm"}}
+{{if .CanCreate}}
     type Create{{.Name}}Req struct {
     {{range $i, $field := .CreateFields -}}
         {{pascal $field.Name}} {{if (eq $field.Type.String  "time.Time") }} string {{else}} {{$field.Type.String}} {{end}} `{{$field.StructTag}}`
     {{end -}}
     }
 {{end}}
+{{end}}
 
 {{define "create_dao"}}
+{{if .CanCreate}}
     // Create for {{firstLower .Name}}Dao Create
     func  (d {{firstLower .Name}}Dao ) Create(ctx context.Context, model *ent.{{.Name}} ) (*ent.{{.Name}}, error) {
     engine := d.Client().{{.Name}}.Create()
@@ -16,8 +19,10 @@
     return engine.Save(ctx)
     }
 {{end}}
+{{end}}
 
 {{define "create_service"}}
+{{if .CanCreate}}
     // Create for {{firstLower .Name}}Service Create
     func  (s {{firstLower .Name}}Service ) Create(ctx context.Context, v vm.Create{{.Name}}Req) (*vm.{{.Name}}, error) {
     if err := servicehelper.Validate(v); err != nil {
@@ -37,12 +42,16 @@
     return data, nil
     }
 {{end}}
+{{end}}
 
 {{define "create_echo_router"}}
+{{if .CanCreate}}
     echohelper.AddRouter({{.Name}}Action, "", echo.POST, {{.Name}}Action.Create)
+{{end}}
 {{end}}
 
 {{define "create_echo"}}
+{{if .CanCreate}}
     // Create for {{firstLower .Name}}Action Create
     func(a {{firstLower .Name}}Action) Create(c echo.Context) error {
     v := vm.Create{{.Name}}Req{}
@@ -52,4 +61,5 @@
     data, err := service.{{.Name}}Service.Create(c.Request().Context(), v)
     return a.RenderWrapper(c, data, err)
     }
+{{end}}
 {{end}}

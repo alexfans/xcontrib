@@ -1,13 +1,25 @@
-{{define "delete_dao"}}
+{{define "delete_dao_hard"}}
     {{if .CanDelete}}
         // Delete for {{firstLower .Name}}Dao Delete
-        func  (d {{firstLower .Name}}Dao ) Delete(ctx context.Context, id int, ps ...predicate.{{.Name}}) (int, error) {
-        engine := d.Client().{{.Name}}.Update()
-        {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+        func  (d {{firstLower .Name}}Dao ) Delete(ctx context.Context, id int, ps []predicate.{{.Name}}) (int, error) {
+        engine := d.Client().{{.Name}}.Delete()
         engine.Where({{camel .Name}}.ID(id))
         engine.Where(ps...)
-        {{if .CanDelete }} engine.SetIsDeleted(1) {{end}}
-        {{if .CanDelete }} engine.SetDeletedAt(time.Now()) {{end}}
+        return engine.Exec(ctx)
+        }
+    {{end}}
+{{end}}
+
+{{define "delete_dao_soft"}}
+    {{if .CanDelete}}
+        // Delete for {{firstLower .Name}}Dao Delete
+        func  (d {{firstLower .Name}}Dao ) Delete(ctx context.Context, id int, ps []predicate.{{.Name}}) (int, error) {
+        engine := d.Client().{{.Name}}.Update()
+        {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+        engine.Where({{camel .Name}}.ID(id))
+        engine.Where(ps...)
+        engine.SetIsDeleted(1)
+        engine.SetDeletedAt(time.Now())
         return engine.Save(ctx)
         }
     {{end}}

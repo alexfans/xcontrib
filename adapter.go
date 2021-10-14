@@ -65,6 +65,8 @@ func (a *Adapter) toDescriptor(genType *gen.Type) (*Descriptor, error) {
 		GenType:      genType,
 		Comments:     serAnnot.Comments,
 		Printers:     loadDescriptorPoint(serAnnot),
+		Methods:      serAnnot.Methods,
+		IsHardDelete: serAnnot.IsHardDelete,
 		FilterList:   serAnnot.FilterList,
 		RestrictList: serAnnot.RestrictList,
 		SortList:     serAnnot.SortList,

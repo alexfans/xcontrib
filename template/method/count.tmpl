@@ -1,14 +1,18 @@
 {{define "count_dao"}}
+{{if .CanCount}}
     // Count for {{firstLower .Name}}Dao Count
     func  (d {{firstLower .Name}}Dao ) Count(ctx context.Context, ps []predicate.{{.Name}}) (int, error) {
     engine := d.Client().{{.Name}}.Query()
-    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
     engine.Where(ps...)
     return engine.Count(ctx)
     }
 {{end}}
+{{end}}
 
 {{define "count_service"}}
+{{if .CanCount}}
+
     // Count for {{firstLower .Name}}Service Count
     func  (s {{firstLower .Name}}Service ) Count(ctx context.Context, param *servicehelper.Param) (*vm.{{.Name}}Count, error) {
     wheres := make([]predicate.{{.Name}}, 0)
@@ -28,12 +32,16 @@
     return data, nil
     }
 {{end}}
+{{end}}
 
 {{define "count_echo_router"}}
+{{if .CanCount}}
     echohelper.AddRouter({{.Name}}Action, "/_count", echo.GET, {{.Name}}Action.Count)
+{{end}}
 {{end}}
 
 {{define "count_echo"}}
+{{if .CanCount}}
     // Count for {{firstLower .Name}}Action Count
     func(a {{firstLower .Name}}Action) Count(c echo.Context) error {
     param := servicehelper.NewParam(c.QueryParams())
@@ -41,4 +49,5 @@
     data, err := service.{{.Name}}Service.Count(c.Request().Context(),param)
     return a.RenderWrapper(c, data, err)
     }
+{{end}}
 {{end}}

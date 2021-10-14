@@ -1,8 +1,9 @@
 {{define "list_dao"}}
+{{if .CanList}}
     // List for {{firstLower .Name}}Dao List
     func  (d {{firstLower .Name}}Dao ) List(ctx context.Context,offset int, limit int, ps []predicate.{{.Name}}, os []ent.OrderFunc) ([]*ent.{{.Name}}, error) {
     engine := d.Client().{{.Name}}.Query()
-    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
     engine.Where(ps...)
     engine.Order(os...)
     engine.Offset(offset)
@@ -10,8 +11,10 @@
     return engine.All(ctx)
     }
 {{end}}
+{{end}}
 
 {{define "list_service"}}
+{{if .CanList}}
     // List for {{firstLower .Name}}Service List
     func  (s {{firstLower .Name}}Service ) List(ctx context.Context, param *servicehelper.Param) (*vm.{{.Name}}List, error) {
     wheres := make([]predicate.{{.Name}}, 0)
@@ -37,12 +40,16 @@
     return data, nil
     }
 {{end}}
+{{end}}
 
 {{define "list_echo_router"}}
+{{if .CanList}}
     echohelper.AddRouter({{.Name}}Action, "", echo.GET, {{.Name}}Action.List)
+{{end}}
 {{end}}
 
 {{define "list_echo"}}
+{{if .CanList}}
     // List for {{firstLower .Name}}Action List
     func (a {{firstLower .Name}}Action) List(c echo.Context) error {
     param := servicehelper.NewParam(c.QueryParams())
@@ -50,4 +57,5 @@
     data, err := service.{{.Name}}Service.List(c.Request().Context(), param)
     return a.RenderWrapper(c, data, err)
     }
+{{end}}
 {{end}}

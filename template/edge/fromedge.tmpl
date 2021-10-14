@@ -2,7 +2,7 @@
     // {{pascal .Edge.Name}} for {{firstLower .Name}}Dao {{pascal .Edge.Name}}
     func  (d {{firstLower .Name}}Dao ) {{pascal .Edge.Name}}(ctx context.Context, id int, ps []predicate.{{pascal .Name}}, eps []predicate.{{.Edge.Type.Name}}) (*ent.{{.Edge.Type.Name}}, error) {
     engine := d.Client().{{.Name}}.Query()
-    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
     engine.Where({{camel .Name}}.ID(id))
     engine.Where(ps...)
     edgeEngine := engine.Query{{pascal .Edge.Name}}()
@@ -16,7 +16,7 @@
     // {{pascal .Edge.Name}} for {{firstLower .Name}}Dao {{pascal .Edge.Name}}
     func  (d {{firstLower .Name}}Dao ) {{pascal .Edge.Name}}(ctx context.Context, id int, offset int, limit int,ps []predicate.{{pascal .Name}}, eps []predicate.{{.Edge.Type.Name}}, eos []ent.OrderFunc) ([]*ent.{{.Edge.Type.Name}}, error) {
     engine := d.Client().{{.Name}}.Query()
-    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
     engine.Where({{camel .Name}}.ID(id))
     engine.Where(ps...)
     edgeEngine := engine.Query{{pascal .Edge.Name}}()
@@ -31,7 +31,7 @@
     // {{pascal .Edge.Name}}Count for {{firstLower .Name}}Dao {{pascal .Edge.Name}}Count
     func  (d {{firstLower .Name}}Dao ) {{pascal .Edge.Name}}Count(ctx context.Context, id int, ps []predicate.{{pascal .Name}},  eps []predicate.{{.Edge.Type.Name}}) (int, error) {
     engine := d.Client().{{.Name}}.Query()
-    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
     engine.Where({{camel .Name}}.ID(id))
     engine.Where(ps...)
     edgeEngine := engine.Query{{pascal .Edge.Name}}()

@@ -12,7 +12,7 @@
     // {{pascal .Edge.Name}}Create for {{firstLower .Name}}Dao {{pascal .Edge.Name}}Create
     func  (d {{firstLower .Name}}Dao ) {{pascal .Edge.Name}}Create(ctx context.Context,id int,idList []int, ps []predicate.{{pascal .Name}}, ) (int, error) {
     engine := d.Client().{{.Name}}.Update()
-    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
     engine.Where(ps...)
     engine.Where({{camel .Name}}.ID(id))
     engine.Add{{.Edge.Type.Name}}IDs(idList...)
@@ -24,7 +24,7 @@
     // {{pascal .Edge.Name}}Delete for {{firstLower .Name}}Dao {{pascal .Edge.Name}}Delete
     func  (d {{firstLower .Name}}Dao ) {{pascal .Edge.Name}}Delete(ctx context.Context,id int, idList []int,  ps []predicate.{{pascal .Name}}) (int, error) {
     engine := d.Client().{{.Name}}.Update()
-    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
     engine.Where({{camel .Name}}.ID(id))
     engine.Where(ps...)
     engine.Remove{{.Edge.Type.Name}}IDs(idList...)

@@ -1,15 +1,18 @@
 {{define "one_dao"}}
+{{if .CanOne}}
     // One for {{firstLower .Name}}Dao One
     func  (d {{firstLower .Name}}Dao ) One(ctx context.Context, id int, ps []predicate.{{.Name}}) (*ent.{{.Name}}, error) {
     engine := d.Client().{{.Name}}.Query()
-    {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+    {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
     engine.Where({{camel .Name}}.ID(id))
     engine.Where(ps...)
     return engine.Only(ctx)
     }
 {{end}}
+{{end}}
 
 {{define "one_service"}}
+{{if .CanOne}}
     // One for {{firstLower .Name}}Service One
     func  (s {{firstLower .Name}}Service ) One(ctx context.Context, id int, param *servicehelper.Param) (*vm.{{.Name}}, error) {
     wheres := make([]predicate.{{.Name}}, 0)
@@ -23,12 +26,16 @@
     return data, nil
     }
 {{end}}
+{{end}}
 
 {{define "one_echo_router"}}
+{{if .CanOne}}
     echohelper.AddRouter({{.Name}}Action, "/:id", echo.GET, {{.Name}}Action.One)
+{{end}}
 {{end}}
 
 {{define "one_echo"}}
+{{if .CanOne}}
     // One for {{firstLower .Name}}Action One
     func(a {{firstLower .Name}}Action) One(c echo.Context) error {
     id, err := strconv.Atoi(c.Param("id"))
@@ -40,4 +47,5 @@
     data, err := service.{{.Name}}Service.One(c.Request().Context(), id, param)
     return a.RenderWrapper(c, data, err)
     }
+{{end}}
 {{end}}

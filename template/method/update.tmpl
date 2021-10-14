@@ -13,12 +13,13 @@
         // Update for {{firstLower .Name}}Dao Update
         func  (d {{firstLower .Name}}Dao ) Update(ctx context.Context, id int, model *ent.{{.Name}}, ps ...predicate.{{.Name}}) (int, error) {
         engine := d.Client().{{.Name}}.Update()
-        {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
+        {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
         engine.Where({{camel .Name}}.ID(id))
         engine.Where(ps...)
         {{range $i, $field := .UpdateFields -}}
             engine.Set{{pascal $field.Name}}(model.{{pascal $field.Name}})
         {{end -}}
+        {{if .HasUpdateField }} engine.Where(SetUpdatedAt(time.Now())) {{end}}
         return engine.Save(ctx)
         }
     {{end}}

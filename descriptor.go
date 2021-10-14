@@ -5,10 +5,12 @@ import (
 )
 
 type Descriptor struct {
-	Name         string     // *gen.Type.Name的冗余
-	Package      string     // go语言的包名
-	BasePackage  string     // 基本包名,如果demo/dao,则BasePackage中`demo`
-	GenType      *gen.Type  // ent生成
+	Name         string    // *gen.Type.Name的冗余
+	Package      string    // go语言的包名
+	BasePackage  string    // 基本包名,如果demo/dao,则BasePackage中`demo`
+	GenType      *gen.Type // ent生成
+	Methods      int
+	IsHardDelete bool
 	Comments     string     // 备注
 	FilterList   []filter   // list,count的中,通过参数进行过滤
 	RestrictList []restrict // 全局过滤,是常量
@@ -42,11 +44,9 @@ func NewEdgeWrapper(d *Descriptor, edge *gen.Edge) *EdgeWrapper {
 }
 
 func (d *Descriptor) CreateFields() []*gen.Field {
-	// TODO
 	fields := make([]*gen.Field, 0)
 	for _, field := range d.GenType.Fields {
-		fieldName := field.Name
-		if fieldName != "created_at" && fieldName != "updated_at" && fieldName != "is_deleted" && fieldName != "deleted_at" {
+		if !IN(field.Name, "created_at", "updated_at", "is_deleted", "deleted_at") {
 			fields = append(fields, field)
 		}
 	}
@@ -54,11 +54,9 @@ func (d *Descriptor) CreateFields() []*gen.Field {
 }
 
 func (d *Descriptor) UpdateFields() []*gen.Field {
-	// TODO
 	fields := make([]*gen.Field, 0)
 	for _, field := range d.GenType.Fields {
-		fieldName := field.Name
-		if fieldName != "created_at" && fieldName != "updated_at" && fieldName != "is_deleted" && fieldName != "deleted_at" {
+		if !IN(field.Name, "created_at", "updated_at", "is_deleted", "deleted_at") {
 			fields = append(fields, field)
 		}
 	}
@@ -66,35 +64,56 @@ func (d *Descriptor) UpdateFields() []*gen.Field {
 }
 
 func (d *Descriptor) ViewFields() []*gen.Field {
-	// TODO
 	fields := make([]*gen.Field, 0)
 	fields = append(fields, d.GenType.ID)
 	for _, field := range d.GenType.Fields {
-		fieldName := field.Name
-		if fieldName != "is_deleted" && fieldName != "deleted_at" {
+		if !IN(field.Name, "is_deleted", "deleted_at") {
 			fields = append(fields, field)
 		}
 	}
 	return fields
 }
 
+func (d *Descriptor) CanCreate() bool {
+	return d.Methods&MethodCreate > 0
+}
+
 func (d *Descriptor) CanDelete() bool {
-	for _, field := range d.GenType.Fields {
-		fieldName := field.Name
-		if fieldName == "is_deleted" {
-			return true
-		}
-		if fieldName == "deleted_at" {
-			return true
-		}
-	}
-	return false
+	return d.Methods&MethodDelete > 0
 }
 
 func (d *Descriptor) CanUpdate() bool {
+	return d.Methods&MethodUpdate > 0
+}
+
+func (d *Descriptor) CanOne() bool {
+	return d.Methods&MethodOne > 0
+}
+
+func (d *Descriptor) CanList() bool {
+	return d.Methods&MethodList > 0
+}
+
+func (d *Descriptor) CanCount() bool {
+	return d.Methods&MethodCount > 0
+}
+
+func (d *Descriptor) HasDeleteField() bool {
+	var at, is bool
 	for _, field := range d.GenType.Fields {
-		fieldName := field.Name
-		if fieldName == "updated_at" {
+		if field.Name == "deleted_at" {
+			at = true
+		}
+		if field.Name == "is_deleted" {
+			is = true
+		}
+	}
+	return at && is
+}
+
+func (d *Descriptor) HasUpdateField() bool {
+	for _, field := range d.GenType.Fields {
+		if field.Name == "updated_at" {
 			return true
 		}
 	}
