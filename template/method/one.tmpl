@@ -1,5 +1,5 @@
 {{define "one_dao"}}
-    // One for {{firstLower .Name}}Dao Update
+    // One for {{firstLower .Name}}Dao One
     func  (d {{firstLower .Name}}Dao ) One(ctx context.Context, id int, ps []predicate.{{.Name}}) (*ent.{{.Name}}, error) {
     engine := d.Client().{{.Name}}.Query()
     {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}

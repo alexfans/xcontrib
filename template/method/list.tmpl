@@ -1,5 +1,5 @@
 {{define "list_dao"}}
-    // List for {{firstLower .Name}}Dao Update
+    // List for {{firstLower .Name}}Dao List
     func  (d {{firstLower .Name}}Dao ) List(ctx context.Context,offset int, limit int, ps []predicate.{{.Name}}, os []ent.OrderFunc) ([]*ent.{{.Name}}, error) {
     engine := d.Client().{{.Name}}.Query()
     {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}

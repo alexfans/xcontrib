@@ -1,5 +1,5 @@
 {{define "count_dao"}}
-    // Count for {{firstLower .Name}}Dao Update
+    // Count for {{firstLower .Name}}Dao Count
     func  (d {{firstLower .Name}}Dao ) Count(ctx context.Context, ps []predicate.{{.Name}}) (int, error) {
     engine := d.Client().{{.Name}}.Query()
     {{if .CanDelete }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
