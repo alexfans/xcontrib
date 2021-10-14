@@ -1,6 +1,5 @@
 {{define "toedge_vm"}}
     type {{.Name}}{{pascal .Edge.Name}} struct {
-    // TODO
     IDList []int `json:"id_list"`
     }
     type {{.Name}}{{pascal .Edge.Name}}Rsp struct {
@@ -34,8 +33,12 @@
 
 {{define "toedge_dao"}}
     {{template "fromedge_dao" .}}
-    {{template "fromedge_dao_create" .}}
-    {{template "fromedge_dao_delete" .}}
+    {{if .CanCreate}}
+        {{template "fromedge_dao_create" .}}
+    {{end}}
+    {{if .CanUpdate}}
+        {{template "fromedge_dao_delete" .}}
+    {{end}}
 {{end}}
 
 {{define "fromedge_service_create" }}
@@ -80,14 +83,22 @@
 
 {{define "toedge_service"}}
     {{template "fromedge_service" .}}
-    {{template "fromedge_service_create" .}}
-    {{template "fromedge_service_delete" .}}
+    {{if .CanCreate}}
+        {{template "fromedge_service_create" .}}
+    {{end}}
+    {{if .CanUpdate}}
+        {{template "fromedge_service_delete" .}}
+    {{end}}
 {{end}}
 
 {{define "toedge_echo_router"}}
     {{template "fromedge_echo_router" .}}
-    echohelper.AddRouter({{.Name}}Action, "/:id/{{.Edge.Name}}", echo.POST, {{.Name}}Action.{{pascal .Edge.Name}}Create)
-    echohelper.AddRouter({{.Name}}Action, "/:id/{{.Edge.Name}}", echo.DELETE, {{.Name}}Action.{{pascal .Edge.Name}}Delete)
+    {{if .CanCreate}}
+        echohelper.AddRouter({{.Name}}Action, "/:id/{{.Edge.Name}}", echo.POST, {{.Name}}Action.{{pascal .Edge.Name}}Create)
+    {{end}}
+    {{if .CanCreate}}
+        echohelper.AddRouter({{.Name}}Action, "/:id/{{.Edge.Name}}", echo.DELETE, {{.Name}}Action.{{pascal .Edge.Name}}Delete)
+    {{end}}
 {{end}}
 
 {{define "fromedge_echo_create"}}
@@ -128,6 +139,10 @@
 
 {{define "toedge_echo"}}
     {{template "fromedge_echo" .}}
-    {{template "fromedge_echo_create" .}}
-    {{template "fromedge_echo_delete" .}}
+    {{if .CanCreate}}
+        {{template "fromedge_echo_create" .}}
+    {{end}}
+    {{if .CanUpdate}}
+        {{template "fromedge_echo_delete" .}}
+    {{end}}
 {{end}}

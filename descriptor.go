@@ -18,31 +18,6 @@ type Descriptor struct {
 	Printers     []*Printer // 打印的方式
 }
 
-type EdgeWrapper struct {
-	*Descriptor
-	Edge         *gen.Edge
-	Comments     string     // 备注
-	FilterList   []filter   // list,count的中,通过参数进行过滤
-	RestrictList []restrict // 全局过滤,是常量
-	SortList     []sort     //排序
-}
-
-func NewEdgeWrapper(d *Descriptor, edge *gen.Edge) *EdgeWrapper {
-	w := &EdgeWrapper{
-		Descriptor: d,
-		Edge:       edge,
-	}
-	serAnnot, err := extractMessageAnnotation(d.Name+"."+edge.Name, edge.Annotations)
-	if err == nil {
-		w.Comments = serAnnot.Comments
-		w.FilterList = serAnnot.FilterList
-		w.RestrictList = serAnnot.RestrictList
-		w.SortList = serAnnot.SortList
-	}
-
-	return w
-}
-
 func (d *Descriptor) CreateFields() []*gen.Field {
 	fields := make([]*gen.Field, 0)
 	for _, field := range d.GenType.Fields {
@@ -154,4 +129,43 @@ func (d *Descriptor) Edges() []*EdgeWrapper {
 type ConditionWrapper struct {
 	Condition
 	GenName string
+}
+
+type EdgeWrapper struct {
+	*Descriptor
+	Edge         *gen.Edge
+	Methods      int
+	IsHardDelete bool
+	Comments     string     // 备注
+	FilterList   []filter   // list,count的中,通过参数进行过滤
+	RestrictList []restrict // 全局过滤,是常量
+	SortList     []sort     //排序
+}
+
+func NewEdgeWrapper(d *Descriptor, edge *gen.Edge) *EdgeWrapper {
+	w := &EdgeWrapper{
+		Descriptor: d,
+		Edge:       edge,
+	}
+	serAnnot, err := extractMessageAnnotation(d.Name+"."+edge.Name, edge.Annotations)
+	if err == nil {
+		w.Comments = serAnnot.Comments
+		w.FilterList = serAnnot.FilterList
+		w.RestrictList = serAnnot.RestrictList
+		w.SortList = serAnnot.SortList
+	}
+
+	return w
+}
+
+func (ew *EdgeWrapper) CanCreate() bool {
+	return ew.Methods&MethodCreate > 0
+}
+
+func (ew *EdgeWrapper) CanUpdate() bool {
+	return ew.Methods&MethodUpdate > 0
+}
+
+func (ew *EdgeWrapper) CanView() bool {
+	return ew.Methods&MethodOne > 0 && ew.Methods&MethodList > 0
 }

@@ -42,10 +42,12 @@
 {{end}}
 
 {{define "fromedge_dao"}}
-    {{if .Edge.Unique}}
-        {{template "fromedge_dao_o2m" .}}
-    {{else}}
-        {{template "fromedge_dao_m2m" .}}
+    {{if .CanView}}
+        {{if .Edge.Unique}}
+            {{template "fromedge_dao_o2m" .}}
+        {{else}}
+            {{template "fromedge_dao_m2m" .}}
+        {{end}}
     {{end}}
 {{end}}
 
@@ -117,10 +119,12 @@
 {{end}}
 
 {{define "fromedge_service"}}
-    {{if .Edge.Unique}}
-        {{template "fromedge_service_o2m" .}}
-    {{else}}
-        {{template "fromedge_service_m2m" .}}
+    {{if .CanView}}
+        {{if .Edge.Unique}}
+            {{template "fromedge_service_o2m" .}}
+        {{else}}
+            {{template "fromedge_service_m2m" .}}
+        {{end}}
     {{end}}
 {{end}}
 
@@ -134,10 +138,12 @@
 {{end}}
 
 {{define "fromedge_echo_router"}}
-    {{if .Edge.Unique}}
-        {{template "fromedge_echo_router_o2m" .}}
-    {{else}}
-        {{template "fromedge_echo_router_m2m" .}}
+    {{if .CanView}}
+        {{if .Edge.Unique}}
+            {{template "fromedge_echo_router_o2m" .}}
+        {{else}}
+            {{template "fromedge_echo_router_m2m" .}}
+        {{end}}
     {{end}}
 {{end}}
 
@@ -182,9 +188,11 @@
 {{end}}
 
 {{define "fromedge_echo"}}
-    {{if .Edge.Unique}}
-        {{template "fromedge_echo_o2m" .}}
-    {{else}}
-        {{template "fromedge_echo_m2m" .}}
+    {{if .CanView}}
+        {{if .Edge.Unique}}
+            {{template "fromedge_echo_o2m" .}}
+        {{else}}
+            {{template "fromedge_echo_m2m" .}}
+        {{end}}
     {{end}}
 {{end}}
