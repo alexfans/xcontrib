@@ -11,7 +11,7 @@
 {{define "update_dao"}}
     {{if .CanUpdate}}
         // Update for {{firstLower .Name}}Dao Update
-        func  (d {{firstLower .Name}}Dao ) Update(ctx context.Context, id int, model *ent.{{.Name}}, ps ...predicate.{{.Name}}) (int, error) {
+        func  (d {{firstLower .Name}}Dao ) Update(ctx context.Context, id int, model *ent.{{.Name}}, ps []predicate.{{.Name}}) (int, error) {
         engine := d.Client().{{.Name}}.Update()
         {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
         engine.Where({{camel .Name}}.ID(id))
@@ -19,7 +19,6 @@
         {{range $i, $field := .UpdateFields -}}
             engine.Set{{pascal $field.Name}}(model.{{pascal $field.Name}})
         {{end -}}
-        {{if .HasUpdateField }} engine.Where(SetUpdatedAt(time.Now())) {{end}}
         return engine.Save(ctx)
         }
     {{end}}
@@ -39,9 +38,8 @@
         if err != nil {
         return nil, err
         }
-        // TODO check empty value
 
-        aff, err := dao.{{.Name}}Dao.Update(ctx, id, model)
+        aff, err := dao.{{.Name}}Dao.Update(ctx, id, model, nil)
         if err != nil {
         return nil, err
         }

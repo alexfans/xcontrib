@@ -36,9 +36,8 @@
         if err != nil {
         return nil, err
         }
-        // TODO check empty value
 
-        aff, err := dao.{{.Name}}Dao.Delete(ctx, id)
+        aff, err := dao.{{.Name}}Dao.Delete(ctx, id, nil)
         if err != nil {
         return nil, err
         }
