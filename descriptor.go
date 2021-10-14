@@ -135,7 +135,6 @@ type EdgeWrapper struct {
 	*Descriptor
 	Edge         *gen.Edge
 	Methods      int
-	IsHardDelete bool
 	Comments     string     // 备注
 	FilterList   []filter   // list,count的中,通过参数进行过滤
 	RestrictList []restrict // 全局过滤,是常量
@@ -146,9 +145,10 @@ func NewEdgeWrapper(d *Descriptor, edge *gen.Edge) *EdgeWrapper {
 	w := &EdgeWrapper{
 		Descriptor: d,
 		Edge:       edge,
+		Methods:    MethodAll,
 	}
 	serAnnot, err := extractMessageAnnotation(d.Name+"."+edge.Name, edge.Annotations)
-	if err == nil {
+	if err == nil && serAnnot != nil {
 		w.Comments = serAnnot.Comments
 		w.FilterList = serAnnot.FilterList
 		w.RestrictList = serAnnot.RestrictList
