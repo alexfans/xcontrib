@@ -79,7 +79,7 @@ func Generate(g *gen.Graph, assign string) error {
 	}
 
 	// 写入
-	baseDir := filepath.Join(g.Config.Target, "..")
+	baseDir := g.Config.Target
 	generateHelper(baseDir, filepath.Dir(g.Config.Package))
 
 	initTemplates()

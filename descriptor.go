@@ -42,6 +42,9 @@ func (d *Descriptor) ViewFields() []*gen.Field {
 	fields := make([]*gen.Field, 0)
 	fields = append(fields, d.GenType.ID)
 	for _, field := range d.GenType.Fields {
+		if field.Sensitive() {
+			continue
+		}
 		if !IN(field.Name, "is_deleted", "deleted_at") {
 			fields = append(fields, field)
 		}
