@@ -44,7 +44,7 @@ func NewParam(values url.Values) *Param {
 	return param
 }
 
-func (p Param) setPage() {
+func (p *Param) setPage() {
 	limit, page, offset := p.Get("limit"), p.Get("page"), p.Get("offset")
 	var err error
 	if limit != "" {
