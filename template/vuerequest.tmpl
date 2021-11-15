@@ -1,2 +1,49 @@
 {{define "vuerequest"}}
+import request from '@/utils/request'
+export function create{{.Name}}(data) {
+  return request({
+    url: `/{{snake .Name}}`,
+    method: 'post',
+    data: data
+  })
+}
+
+export function delete{{.Name}} (id) {
+  return request({
+    url: `/{{snake .Name}}/${id}`,
+    method: 'delete'
+  })
+}
+
+export function update{{.Name}} (id, data) {
+  return request({
+    url: `/{{snake .Name}}/${id}/_extend`,
+    method: 'put',
+    data: data
+  })
+}
+
+export function one{{.Name}} (id) {
+  return request({
+    url: `/{{snake .Name}}/${id}`,
+    method: 'get'
+  })
+}
+
+export function list{{.Name}} (params) {
+  return request({
+    url: `/{{snake .Name}}`,
+    method: 'get',
+    params: params
+  })
+}
+
+export function count{{.Name}} (params) {
+  return request({
+    url: `/{{snake .Name}}/_count`,
+    method: 'get',
+    params: params
+  })
+}
+
 {{end}}

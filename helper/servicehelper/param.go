@@ -107,7 +107,7 @@ func (p Param) Get(name string) string {
 
 func (p Param) GetInt(name string) (int, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return 0, NoParamErr
 	}
 	return parseInt(s)
@@ -115,7 +115,7 @@ func (p Param) GetInt(name string) (int, error) {
 
 func (p Param) GetInts(name string) ([]int, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return nil, NoParamErr
 	}
 	ss := strings.Split(s, separated)
@@ -136,7 +136,7 @@ func (p Param) GetInts(name string) ([]int, error) {
 
 func (p Param) GetInt8(name string) (int8, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return 0, NoParamErr
 	}
 	return parseInt8(s)
@@ -144,7 +144,7 @@ func (p Param) GetInt8(name string) (int8, error) {
 
 func (p Param) GetInt8s(name string) ([]int8, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return nil, NoParamErr
 	}
 	ss := strings.Split(s, separated)
@@ -165,7 +165,7 @@ func (p Param) GetInt8s(name string) ([]int8, error) {
 
 func (p Param) GetInt16(name string) (int16, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return 0, NoParamErr
 	}
 	return parseInt16(s)
@@ -173,7 +173,7 @@ func (p Param) GetInt16(name string) (int16, error) {
 
 func (p Param) GetInt16s(name string) ([]int16, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return nil, NoParamErr
 	}
 	ss := strings.Split(s, separated)
@@ -194,7 +194,7 @@ func (p Param) GetInt16s(name string) ([]int16, error) {
 
 func (p Param) GetInt32(name string) (int32, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return 0, NoParamErr
 	}
 	return parseInt32(s)
@@ -202,7 +202,7 @@ func (p Param) GetInt32(name string) (int32, error) {
 
 func (p Param) GetInt32s(name string) ([]int32, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return nil, NoParamErr
 	}
 	ss := strings.Split(s, separated)
@@ -223,7 +223,7 @@ func (p Param) GetInt32s(name string) ([]int32, error) {
 
 func (p Param) GetInt64(name string) (int64, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return 0, NoParamErr
 	}
 	return parseInt64(s)
@@ -231,7 +231,7 @@ func (p Param) GetInt64(name string) (int64, error) {
 
 func (p Param) GetInt64s(name string) ([]int64, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return nil, NoParamErr
 	}
 	ss := strings.Split(s, separated)
@@ -252,7 +252,7 @@ func (p Param) GetInt64s(name string) ([]int64, error) {
 
 func (p Param) GetFloat32(name string) (float32, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return 0.0, NoParamErr
 	}
 	return parseFloat32(s)
@@ -260,7 +260,7 @@ func (p Param) GetFloat32(name string) (float32, error) {
 
 func (p Param) GetFloat32s(name string) ([]float32, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return nil, NoParamErr
 	}
 	ss := strings.Split(s, separated)
@@ -281,7 +281,7 @@ func (p Param) GetFloat32s(name string) ([]float32, error) {
 
 func (p Param) GetFloat64(name string) (float64, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return 0.0, NoParamErr
 	}
 	return parseFloat64(s)
@@ -289,7 +289,7 @@ func (p Param) GetFloat64(name string) (float64, error) {
 
 func (p Param) GetFloat64s(name string) ([]float64, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return nil, NoParamErr
 	}
 	ss := strings.Split(s, separated)
@@ -310,7 +310,7 @@ func (p Param) GetFloat64s(name string) ([]float64, error) {
 
 func (p Param) GetTime(name string) (time.Time, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return time.Now(), NoParamErr
 	}
 	return parseTime(s)
@@ -318,7 +318,7 @@ func (p Param) GetTime(name string) (time.Time, error) {
 
 func (p Param) GetTimes(name string) ([]time.Time, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return nil, NoParamErr
 	}
 	ss := strings.Split(s, separated)
@@ -339,7 +339,7 @@ func (p Param) GetTimes(name string) ([]time.Time, error) {
 
 func (p Param) GetString(name string) (string, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return "", NoParamErr
 	}
 	return parseString(s)
@@ -347,7 +347,7 @@ func (p Param) GetString(name string) (string, error) {
 
 func (p Param) GetStrings(name string) ([]string, error) {
 	s := p.Get(name)
-	if name == "" {
+	if s == "" {
 		return nil, NoParamErr
 	}
 	ss := strings.Split(s, separated)
