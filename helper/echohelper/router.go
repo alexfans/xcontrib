@@ -51,7 +51,6 @@ func (routers *Routers) AddRouter(a Action, path string, method string, handler 
 		Handler:    handler,
 		Middleware: middleware,
 	})
-	router.methods = append(router.methods)
 	routers.m[a.Name()] = router
 }
 

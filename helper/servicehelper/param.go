@@ -19,7 +19,7 @@ var (
 const (
 	maxLimit      = 500
 	defaultLimit  = 20
-	defaultOffset = 1
+	defaultOffset = 0
 )
 
 const (
