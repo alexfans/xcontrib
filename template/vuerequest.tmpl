@@ -17,7 +17,7 @@ export function delete{{.Name}} (id) {
 
 export function update{{.Name}} (id, data) {
   return request({
-    url: `/{{snake .Name}}/${id}/_extend`,
+    url: `/{{snake .Name}}/${id}`,
     method: 'put',
     data: data
   })
