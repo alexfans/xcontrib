@@ -5,17 +5,18 @@ import (
 )
 
 type Descriptor struct {
-	Name         string    // *gen.Type.Name的冗余
-	Package      string    // go语言的包名
-	BasePackage  string    // 基本包名,如果demo/dao,则BasePackage中`demo`
-	GenType      *gen.Type // ent生成
-	Methods      int
-	IsHardDelete bool
-	Comments     string     // 备注
-	FilterList   []filter   // list,count的中,通过参数进行过滤
-	RestrictList []restrict // 全局过滤,是常量
-	SortList     []sort     //排序
-	Printers     []*Printer // 打印的方式
+	Name            string    // *gen.Type.Name的冗余
+	Package         string    // go语言的包名
+	BasePackage     string    // 基本包名,如果demo/dao,则BasePackage中`demo`
+	GenType         *gen.Type // ent生成
+	Methods         int
+	IsHardDelete    bool
+	Comments        string     // 备注
+	FilterList      []filter   // list,count的中,通过参数进行过滤
+	RestrictList    []restrict // 全局过滤,是常量
+	SortList        []sort     //排序
+	UpdateFieldList []string   //更新字段
+	Printers        []*Printer // 打印的方式
 }
 
 func (d *Descriptor) CreateFields() []*gen.Field {
@@ -31,7 +32,7 @@ func (d *Descriptor) CreateFields() []*gen.Field {
 func (d *Descriptor) UpdateFields() []*gen.Field {
 	fields := make([]*gen.Field, 0)
 	for _, field := range d.GenType.Fields {
-		if !IN(field.Name, "created_at", "updated_at", "is_deleted", "deleted_at") {
+		if IN(field.Name, d.UpdateFieldList...) {
 			fields = append(fields, field)
 		}
 	}
@@ -136,12 +137,13 @@ type ConditionWrapper struct {
 
 type EdgeWrapper struct {
 	*Descriptor
-	Edge         *gen.Edge
-	Methods      int
-	Comments     string     // 备注
-	FilterList   []filter   // list,count的中,通过参数进行过滤
-	RestrictList []restrict // 全局过滤,是常量
-	SortList     []sort     //排序
+	Edge            *gen.Edge
+	Methods         int
+	Comments        string     // 备注
+	FilterList      []filter   // list,count的中,通过参数进行过滤
+	RestrictList    []restrict // 全局过滤,是常量
+	SortList        []sort     //排序
+	UpdateFieldList []string   // 更新字段
 }
 
 func NewEdgeWrapper(d *Descriptor, edge *gen.Edge) *EdgeWrapper {
@@ -156,6 +158,7 @@ func NewEdgeWrapper(d *Descriptor, edge *gen.Edge) *EdgeWrapper {
 		w.FilterList = serAnnot.FilterList
 		w.RestrictList = serAnnot.RestrictList
 		w.SortList = serAnnot.SortList
+		w.UpdateFieldList = serAnnot.UpdateFieldList
 	}
 
 	return w

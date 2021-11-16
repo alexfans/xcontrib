@@ -34,13 +34,14 @@ const (
 )
 
 type service struct {
-	Options      int
-	Methods      int
-	IsHardDelete bool
-	Comments     string
-	FilterList   []filter // 通过参数来过来条件
-	RestrictList []restrict
-	SortList     []sort
+	Options         int
+	Methods         int
+	IsHardDelete    bool
+	Comments        string
+	FilterList      []filter // 通过参数来过来条件
+	RestrictList    []restrict
+	SortList        []sort
+	UpdateFieldList []string
 }
 
 func (service) Name() string {
@@ -49,12 +50,13 @@ func (service) Name() string {
 
 func Service(options int) *service {
 	return &service{
-		Options:      options,
-		IsHardDelete: false,
-		Methods:      MethodAll,
-		FilterList:   make([]filter, 0),
-		RestrictList: make([]restrict, 0),
-		SortList:     make([]sort, 0),
+		Options:         options,
+		IsHardDelete:    false,
+		Methods:         MethodAll,
+		FilterList:      make([]filter, 0),
+		RestrictList:    make([]restrict, 0),
+		SortList:        make([]sort, 0),
+		UpdateFieldList: make([]string, 0),
 	}
 }
 
@@ -90,6 +92,11 @@ func (s *service) Restricts(restricts ...restrict) *service {
 
 func (s *service) Sorts(sorts ...sort) *service {
 	s.SortList = sorts
+	return s
+}
+
+func (s *service) UpdateFields(fields ...string) *service {
+	s.UpdateFieldList = fields
 	return s
 }
 

@@ -70,6 +70,7 @@ func (a *Adapter) toDescriptor(genType *gen.Type) (*Descriptor, error) {
 		FilterList:   serAnnot.FilterList,
 		RestrictList: serAnnot.RestrictList,
 		SortList:     serAnnot.SortList,
+		UpdateFieldList:    serAnnot.UpdateFieldList,
 	}
 
 	return msg, nil

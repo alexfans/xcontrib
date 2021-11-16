@@ -39,6 +39,12 @@
         return nil, err
         }
 
+        {
+            {{range $i, $field := .UpdateFields -}}
+                model.{{pascal $field.Name}} = {{if (eq $field.Type.String  "time.Time") }} servicehelper.TimeParse(v.{{pascal $field.Name}}) {{else}} v.{{pascal $field.Name}} {{end}}
+            {{end -}}
+        }
+
         aff, err := dao.{{.Name}}Dao.Update(ctx, id, model, nil)
         if err != nil {
         return nil, err
