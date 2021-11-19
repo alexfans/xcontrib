@@ -14,7 +14,7 @@
     {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
     engine.Where(ps...)
     engine.Where({{camel .Name}}.ID(id))
-    engine.Add{{.Edge.Type.Name}}IDs(idList...)
+    engine.Add{{pascal .Edge.Name}}IDs(idList...)
     return engine.Save(ctx)
     }
 {{end}}
@@ -26,7 +26,7 @@
     {{if .HasDeleteField }} engine.Where({{camel .Name}}.IsDeleted(0)) {{end}}
     engine.Where({{camel .Name}}.ID(id))
     engine.Where(ps...)
-    engine.Remove{{.Edge.Type.Name}}IDs(idList...)
+    engine.Remove{{pascal .Edge.Name}}IDs(idList...)
     return engine.Save(ctx)
     }
 {{end}}
