@@ -2,7 +2,7 @@
 {{if .CanCreate}}
     type Create{{.Name}}Req struct {
     {{range $i, $field := .CreateFields -}}
-        {{pascal $field.Name}} {{if (eq $field.Type.String  "time.Time") }} string {{else}} {{$field.Type.String}} {{end}} `{{$field.StructTag}}`
+        {{pascal $field.Name}} {{if (eq $field.Type.String  "time.Time") }} string {{else}} {{$field.Type.String}} {{end}} `json:"{{snake $field.Name}}"`
     {{end -}}
     }
 {{end}}

@@ -3,7 +3,7 @@
 
     type {{.Name}} struct {
     {{range $i, $field := .ViewFields -}}
-        {{pascal $field.Name}} {{if (eq $field.Type.String  "time.Time") }} string {{else}} {{$field.Type.String}} {{end}} `{{$field.StructTag}}`
+        {{pascal $field.Name}} {{if (eq $field.Type.String  "time.Time") }} string {{else}} {{$field.Type.String}} {{end}} `json:"{{snake $field.Name}}"`
     {{end -}}
     }
 
