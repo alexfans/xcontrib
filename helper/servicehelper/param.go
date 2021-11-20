@@ -41,6 +41,7 @@ func NewParam(values url.Values) *Param {
 		offset: defaultOffset,
 	}
 	param.setPage()
+	param.setOrders()
 	return param
 }
 
