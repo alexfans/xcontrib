@@ -78,7 +78,7 @@ func (p *Param) setPage() {
 	}
 }
 
-func (p Param) setOrders() {
+func (p *Param) setOrders() {
 	orders := p.Get("orders")
 	if orders != "" {
 		p.orders = strings.Split(orders, ",")
