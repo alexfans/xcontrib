@@ -113,7 +113,7 @@
     return a.RenderRequestError(c, err)
     }
 
-    param := servicehelper.NewParam(c.QueryParams())
+    param := servicehelper.NewParam(c.QueryParams(), c)
     data, err := service.{{.Name}}Service.{{pascal .Edge.Name}}Create(c.Request().Context(), id, v, param)
     return a.RenderWrapper(c, data, err)
     }
@@ -130,7 +130,7 @@
     if err != nil {
     return a.RenderRequestError(c, err)
     }
-    param := servicehelper.NewParam(c.QueryParams())
+    param := servicehelper.NewParam(c.QueryParams(), c)
 
     data, err := service.{{.Name}}Service.{{pascal .Edge.Name}}Delete(c.Request().Context(), id, v, param)
     return a.RenderWrapper(c, data, err)

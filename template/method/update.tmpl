@@ -77,7 +77,7 @@
         if err := a.Bind(c, &v); err != nil {
         return a.RenderRequestError(c, err)
         }
-        param := servicehelper.NewParam(c.QueryParams())
+        param := servicehelper.NewParam(c.QueryParams(), c)
 
         data, err := service.{{.Name}}Service.Update(c.Request().Context(), id, v, param)
         return a.RenderWrapper(c, data, err)

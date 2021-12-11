@@ -44,7 +44,7 @@
 {{if .CanCount}}
     // Count for {{firstLower .Name}}Action Count
     func(a {{firstLower .Name}}Action) Count(c echo.Context) error {
-    param := servicehelper.NewParam(c.QueryParams())
+    param := servicehelper.NewParam(c.QueryParams(), c)
 
     data, err := service.{{.Name}}Service.Count(c.Request().Context(),param)
     return a.RenderWrapper(c, data, err)

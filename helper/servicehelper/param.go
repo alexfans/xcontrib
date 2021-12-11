@@ -16,6 +16,10 @@ var (
 	NoParamErr = errors.New("no found param value")
 )
 
+type Store interface {
+	Get(string) interface{}
+}
+
 const (
 	maxLimit      = 500
 	defaultLimit  = 20
@@ -28,14 +32,16 @@ const (
 )
 
 type Param struct {
+	store  Store
 	values url.Values
 	orders []string
 	limit  int
 	offset int
 }
 
-func NewParam(values url.Values) *Param {
+func NewParam(values url.Values, store Store) *Param {
 	param := &Param{
+		store:  store,
 		values: values,
 		limit:  defaultLimit,
 		offset: defaultOffset,
@@ -83,6 +89,10 @@ func (p *Param) setOrders() {
 	if orders != "" {
 		p.orders = strings.Split(orders, ",")
 	}
+}
+
+func (p Param) StoreGet(name string) interface{} {
+	return p.store.Get(name)
 }
 
 func (p Param) Offset() int {

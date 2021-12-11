@@ -52,7 +52,7 @@
 {{if .CanList}}
     // List for {{firstLower .Name}}Action List
     func (a {{firstLower .Name}}Action) List(c echo.Context) error {
-    param := servicehelper.NewParam(c.QueryParams())
+    param := servicehelper.NewParam(c.QueryParams(), c)
 
     data, err := service.{{.Name}}Service.List(c.Request().Context(), param)
     return a.RenderWrapper(c, data, err)

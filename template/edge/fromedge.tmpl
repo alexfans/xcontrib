@@ -154,7 +154,7 @@
     if err != nil {
     return a.RenderRequestError(c, err)
     }
-    param := servicehelper.NewParam(c.QueryParams())
+    param := servicehelper.NewParam(c.QueryParams(), c)
 
     data, err := service.{{.Name}}Service.{{pascal .Edge.Name}}(c.Request().Context(), id, param)
     return a.RenderWrapper(c, data, err)
@@ -168,7 +168,7 @@
     if err != nil {
     return a.RenderRequestError(c, err)
     }
-    param := servicehelper.NewParam(c.QueryParams())
+    param := servicehelper.NewParam(c.QueryParams(), c)
 
     data, err := service.{{.Name}}Service.{{pascal .Edge.Name}}(c.Request().Context(), id, param)
     return a.RenderWrapper(c, data, err)
@@ -181,7 +181,7 @@
     return a.RenderRequestError(c, err)
     }
 
-    param := servicehelper.NewParam(c.QueryParams())
+    param := servicehelper.NewParam(c.QueryParams(), c)
     data, err := service.{{.Name}}Service.{{pascal .Edge.Name}}Count(c.Request().Context(), id, param)
     return a.RenderWrapper(c, data, err)
     }
